@@ -112,16 +112,16 @@ export const TopBar: React.FC<TopBarProps> = ({
           <UserProfile
             user={{
               id: user.id,
-              firstName: user.firstName,
-              lastName: user.lastName,
-              fullName: user.fullName,
+              firstName: user.firstName || undefined,
+              lastName: user.lastName || undefined,
+              fullName: user.fullName || undefined,
               email: user.primaryEmailAddress?.emailAddress,
-              imageUrl: user.imageUrl
+              imageUrl: user.imageUrl || undefined
             }}
             organization={organization ? {
               id: organization.id,
               name: organization.name,
-              slug: organization.slug
+              slug: organization.slug || undefined
             } : undefined}
             onClick={handleProfileClick}
           />
