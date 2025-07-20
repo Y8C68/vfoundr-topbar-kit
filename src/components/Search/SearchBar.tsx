@@ -38,16 +38,38 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <form onSubmit={handleSubmit} className="relative">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+        <Search 
+          className="absolute h-4 w-4 text-slate-400" 
+          style={{ 
+            left: '12px', 
+            top: '50%', 
+            transform: 'translateY(-50%)',
+            position: 'absolute',
+            zIndex: 10
+          }} 
+        />
         <input
           id="universal-search"
           type="text"
           placeholder={placeholder}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className={`w-full min-w-[300px] max-w-[600px] pl-10 pr-16 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${className || ''}`}
+          className={`w-full min-w-[300px] max-w-[600px] py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${className || ''}`}
+          style={{
+            paddingLeft: '40px',
+            paddingRight: '64px'
+          }}
         />
-        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1 text-xs text-slate-400">
+        <div 
+          className="absolute flex items-center space-x-1 text-xs text-slate-400"
+          style={{
+            right: '12px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            position: 'absolute',
+            zIndex: 10
+          }}
+        >
           <Command className="h-3 w-3" />
           <span>K</span>
         </div>
