@@ -49,7 +49,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         />
         <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1 text-xs text-slate-400">
           <Command className="h-3 w-3" />
-          <span>{formatKeyboardShortcut().replace(/[⌘]/g, '')}</span>
+          <span>K</span>
         </div>
       </div>
     </form>
