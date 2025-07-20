@@ -1,6 +1,6 @@
 {
   "name": "@y8c68/topbar-kit",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Shared top bar component for VFoundr applications",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -54,14 +54,18 @@
     "react-router-dom": "^6.0.0"
   },
   "dependencies": {
+    "@y8c68/topbar-kit": "^0.1.0",
     "clsx": "^2.0.0"
   },
   "devDependencies": {
+    "@clerk/clerk-react": "^5.35.3",
     "@types/node": "^20.0.0",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
+    "lucide-react": "^0.300.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
+    "react-router-dom": "^6.30.1",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0"
   }

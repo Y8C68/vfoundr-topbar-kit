@@ -5,6 +5,7 @@ import { Bell, Settings, ChevronDown } from 'lucide-react'
 import { SearchBar } from '../Search/SearchBar'
 import { NotificationBell } from '../Notifications/NotificationBell'
 import { UserProfile } from '../UserProfile/UserProfile'
+import { UserProfileModal } from '../UserProfile/UserProfileModal'
 import { TopBarConfig, TopBarAction } from '../../lib/types'
 import { clsx } from 'clsx'
 
@@ -20,8 +21,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   const navigate = useNavigate()
   const { user } = useUser()
   const { organization } = useOrganization()
-  const [showProfileMenu, setShowProfileMenu] = useState(false)
-  const profileRef = useRef<HTMLDivElement>(null)
+  const [showProfileModal, setShowProfileModal] = useState(false)
 
   const {
     showSearch = true,
@@ -32,27 +32,61 @@ export const TopBar: React.FC<TopBarProps> = ({
     customActions = [],
     onSearch,
     onNotificationClick,
+    onProfileClick,
+    onOrganizationClick,
+    onSubscriptionsClick,
+    onSignOutClick,
     settingsPath = '/settings',
     accountPath = '/account'
   } = config
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
-        setShowProfileMenu(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
 
   const handleSettingsClick = () => {
     navigate(settingsPath)
   }
 
-  const handleProfileClick = () => {
-    navigate(accountPath)
+  const handleUserProfileClick = () => {
+    setShowProfileModal(true)
+  }
+
+  const handleCloseModal = () => {
+    setShowProfileModal(false)
+  }
+
+  const handleDefaultProfileClick = () => {
+    if (onProfileClick) {
+      onProfileClick()
+    } else {
+      navigate(accountPath)
+    }
+  }
+
+  const handleDefaultOrganizationClick = () => {
+    if (onOrganizationClick) {
+      onOrganizationClick()
+    } else {
+      // Default organization action
+      console.log('Organization clicked')
+    }
+  }
+
+  const handleDefaultSubscriptionsClick = () => {
+    if (onSubscriptionsClick) {
+      onSubscriptionsClick()
+    } else {
+      // Default subscriptions action
+      console.log('Subscriptions clicked')
+    }
+  }
+
+  const handleDefaultSignOutClick = () => {
+    if (onSignOutClick) {
+      onSignOutClick()
+    } else {
+      // Default sign out action
+      if ((window as any).Clerk) {
+        (window as any).Clerk.signOut()
+      }
+    }
   }
 
   return (
@@ -123,10 +157,35 @@ export const TopBar: React.FC<TopBarProps> = ({
               name: organization.name,
               slug: organization.slug || undefined
             } : undefined}
-            onClick={handleProfileClick}
+            onClick={handleUserProfileClick}
           />
         )}
       </div>
+
+      {/* User Profile Modal */}
+      {showUserProfile && user && (
+        <UserProfileModal
+          user={{
+            id: user.id,
+            firstName: user.firstName || undefined,
+            lastName: user.lastName || undefined,
+            fullName: user.fullName || undefined,
+            email: user.primaryEmailAddress?.emailAddress,
+            imageUrl: user.imageUrl || undefined
+          }}
+          organization={organization ? {
+            id: organization.id,
+            name: organization.name,
+            slug: organization.slug || undefined
+          } : undefined}
+          isOpen={showProfileModal}
+          onClose={handleCloseModal}
+          onProfileClick={handleDefaultProfileClick}
+          onOrganizationClick={handleDefaultOrganizationClick}
+          onSubscriptionsClick={handleDefaultSubscriptionsClick}
+          onSignOutClick={handleDefaultSignOutClick}
+        />
+      )}
     </div>
   )
 }

@@ -9,6 +9,10 @@ export interface TopBarConfig {
   customActions?: TopBarAction[]
   onSearch?: (query: string) => void
   onNotificationClick?: () => void
+  onProfileClick?: () => void
+  onOrganizationClick?: () => void
+  onSubscriptionsClick?: () => void
+  onSignOutClick?: () => void
   settingsPath?: string
   accountPath?: string
 }
