@@ -54,7 +54,6 @@
     "react-router-dom": "^6.0.0"
   },
   "dependencies": {
-    "@y8c68/topbar-kit": "^0.1.0",
     "clsx": "^2.0.0"
   },
   "devDependencies": {
