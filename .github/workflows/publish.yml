@@ -24,10 +24,17 @@ jobs:
       - name: Clean npm cache
         run: npm cache clean --force
         
+      - name: Configure npm authentication
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
+          echo "@y8c68:registry=https://npm.pkg.github.com" >> ~/.npmrc
+      
       - name: Install dependencies
         run: |
           rm -rf node_modules package-lock.json
-          npm install
+          npm install --legacy-peer-deps
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       
       - name: Build package
         run: npm run build
@@ -38,4 +45,4 @@ jobs:
       - name: Publish package
         run: npm publish
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
