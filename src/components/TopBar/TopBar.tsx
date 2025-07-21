@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUser, useOrganization } from '@clerk/clerk-react'
 import { Bell, Settings, ChevronDown } from 'lucide-react'
@@ -19,8 +19,8 @@ export const TopBar: React.FC<TopBarProps> = ({
   className 
 }) => {
   const navigate = useNavigate()
-  const { user } = useUser()
-  const { organization } = useOrganization()
+  const { user, isLoaded: userLoaded } = useUser()
+  const { organization, isLoaded: orgLoaded } = useOrganization()
   const [showProfileModal, setShowProfileModal] = useState(false)
 
   const {
@@ -40,45 +40,45 @@ export const TopBar: React.FC<TopBarProps> = ({
     accountPath = '/account'
   } = config
 
-  const handleSettingsClick = () => {
+  const handleSettingsClick = useCallback(() => {
     navigate(settingsPath)
-  }
+  }, [navigate, settingsPath])
 
-  const handleUserProfileClick = () => {
+  const handleUserProfileClick = useCallback(() => {
     setShowProfileModal(true)
-  }
+  }, [])
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setShowProfileModal(false)
-  }
+  }, [])
 
-  const handleDefaultProfileClick = () => {
+  const handleDefaultProfileClick = useCallback(() => {
     if (onProfileClick) {
       onProfileClick()
     } else {
       navigate(accountPath)
     }
-  }
+  }, [onProfileClick, navigate, accountPath])
 
-  const handleDefaultOrganizationClick = () => {
+  const handleDefaultOrganizationClick = useCallback(() => {
     if (onOrganizationClick) {
       onOrganizationClick()
     } else {
       // Default organization action
       console.log('Organization clicked')
     }
-  }
+  }, [onOrganizationClick])
 
-  const handleDefaultSubscriptionsClick = () => {
+  const handleDefaultSubscriptionsClick = useCallback(() => {
     if (onSubscriptionsClick) {
       onSubscriptionsClick()
     } else {
       // Default subscriptions action
       console.log('Subscriptions clicked')
     }
-  }
+  }, [onSubscriptionsClick])
 
-  const handleDefaultSignOutClick = () => {
+  const handleDefaultSignOutClick = useCallback(() => {
     if (onSignOutClick) {
       onSignOutClick()
     } else {
@@ -87,6 +87,48 @@ export const TopBar: React.FC<TopBarProps> = ({
         (window as any).Clerk.signOut()
       }
     }
+  }, [onSignOutClick])
+
+  // Memoize user and organization data to prevent unnecessary re-renders
+  const userData = useMemo(() => {
+    if (!userLoaded || !user) return null
+    return {
+      id: user.id,
+      firstName: user.firstName || undefined,
+      lastName: user.lastName || undefined,
+      fullName: user.fullName || undefined,
+      email: user.primaryEmailAddress?.emailAddress,
+      imageUrl: user.imageUrl || undefined
+    }
+  }, [userLoaded, user])
+
+  const organizationData = useMemo(() => {
+    if (!orgLoaded) return undefined
+    if (!organization) return undefined
+    return {
+      id: organization.id,
+      name: organization.name,
+      slug: organization.slug || undefined
+    }
+  }, [orgLoaded, organization])
+
+  // Don't render until both user and organization data are loaded
+  if (!userLoaded || !orgLoaded) {
+    return (
+      <div className={clsx(
+        'h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6',
+        className
+      )}>
+        <div className="animate-pulse">
+          <div className="h-8 bg-slate-200 rounded-md w-96"></div>
+        </div>
+        <div className="flex items-center space-x-3">
+          <div className="animate-pulse">
+            <div className="h-8 w-8 bg-slate-200 rounded-full"></div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -142,42 +184,20 @@ export const TopBar: React.FC<TopBarProps> = ({
         )}
 
         {/* Profile Dropdown */}
-        {showUserProfile && user && (
+        {showUserProfile && userData && (
           <UserProfile
-            user={{
-              id: user.id,
-              firstName: user.firstName || undefined,
-              lastName: user.lastName || undefined,
-              fullName: user.fullName || undefined,
-              email: user.primaryEmailAddress?.emailAddress,
-              imageUrl: user.imageUrl || undefined
-            }}
-            organization={organization ? {
-              id: organization.id,
-              name: organization.name,
-              slug: organization.slug || undefined
-            } : undefined}
+            user={userData}
+            organization={organizationData}
             onClick={handleUserProfileClick}
           />
         )}
       </div>
 
       {/* User Profile Modal */}
-      {showUserProfile && user && (
+      {showUserProfile && userData && (
         <UserProfileModal
-          user={{
-            id: user.id,
-            firstName: user.firstName || undefined,
-            lastName: user.lastName || undefined,
-            fullName: user.fullName || undefined,
-            email: user.primaryEmailAddress?.emailAddress,
-            imageUrl: user.imageUrl || undefined
-          }}
-          organization={organization ? {
-            id: organization.id,
-            name: organization.name,
-            slug: organization.slug || undefined
-          } : undefined}
+          user={userData}
+          organization={organizationData}
           isOpen={showProfileModal}
           onClose={handleCloseModal}
           onProfileClick={handleDefaultProfileClick}

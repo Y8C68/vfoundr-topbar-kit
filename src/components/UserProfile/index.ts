@@ -1,2 +1,5 @@
 export * from './UserProfile'
 export * from './UserProfileModal'
+export * from './UserProfileDetailsModal'
+export * from './OrganizationModal'
+export * from './SubscriptionsModal'

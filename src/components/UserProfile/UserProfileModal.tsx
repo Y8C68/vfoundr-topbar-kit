@@ -56,35 +56,118 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
   const displayName = user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim()
 
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-20 flex items-start justify-end pt-16 pr-6">
+    <div 
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 9999,
+        backgroundColor: 'rgba(0, 0, 0, 0.1)',
+        backdropFilter: 'blur(1px)',
+        display: 'flex',
+        alignItems: 'flex-start',
+        justifyContent: 'flex-end',
+        paddingTop: '64px',
+        paddingRight: '24px',
+        pointerEvents: 'auto'
+      }}
+    >
       <div
         ref={modalRef}
-        className={`bg-white rounded-lg shadow-xl border border-slate-200 min-w-64 overflow-hidden ${className || ''}`}
+        style={{
+          position: 'relative',
+          zIndex: 10000,
+          backgroundColor: 'white',
+          borderRadius: '8px',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+          border: '1px solid #e2e8f0',
+          minWidth: '320px',
+          maxWidth: '384px',
+          overflow: 'hidden',
+          pointerEvents: 'auto',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
+          color: '#0f172a'
+        }}
+        className={className || ''}
       >
         {/* User Info Header */}
-        <div className="px-4 py-3 border-b border-slate-200 bg-slate-50">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center overflow-hidden">
+        <div style={{
+          padding: '20px 24px',
+          borderBottom: '1px solid #e2e8f0',
+          backgroundColor: '#f8fafc'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px'
+          }}>
+            <div style={{
+              width: '48px',
+              height: '48px',
+              background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              overflow: 'hidden',
+              flexShrink: 0
+            }}>
               {user.imageUrl ? (
                 <img 
                   src={user.imageUrl} 
                   alt={displayName || 'User'} 
-                  className="w-10 h-10 rounded-full object-cover"
+                  style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '50%',
+                    objectFit: 'cover'
+                  }}
                 />
               ) : (
-                <span className="text-white font-semibold text-sm">
+                <span style={{
+                  color: 'white',
+                  fontWeight: '600',
+                  fontSize: '16px'
+                }}>
                   {displayName?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
                 </span>
               )}
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-slate-900 truncate">
+            <div style={{
+              flex: 1,
+              minWidth: 0
+            }}>
+              <p style={{
+                fontSize: '16px',
+                fontWeight: '500',
+                color: '#0f172a',
+                margin: 0,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
+              }}>
                 {displayName || 'User'}
               </p>
-              <p className="text-xs text-slate-600 truncate">
+              <p style={{
+                fontSize: '14px',
+                color: '#475569',
+                margin: '4px 0 0 0',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
+              }}>
                 {user.email || 'No email'}
               </p>
-              <p className="text-xs text-slate-500 truncate">
+              <p style={{
+                fontSize: '14px',
+                color: '#64748b',
+                margin: '2px 0 0 0',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
+              }}>
                 {organization?.name || 'Personal Account'}
               </p>
             </div>
@@ -92,15 +175,32 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
         </div>
 
         {/* Menu Options */}
-        <div className="py-2">
+        <div style={{ padding: '12px 0' }}>
           <button
             onClick={() => {
               onProfileClick?.()
               onClose()
             }}
-            className="w-full flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 transition-colors"
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              padding: '12px 24px',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#374151',
+              backgroundColor: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s ease',
+              textAlign: 'left',
+              fontFamily: 'inherit',
+              outline: 'none'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
-            <User className="w-4 h-4 mr-3 text-slate-500" />
+            <User style={{ width: '20px', height: '20px', marginRight: '16px', color: '#64748b' }} />
             Profile
           </button>
 
@@ -109,9 +209,26 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
               onOrganizationClick?.()
               onClose()
             }}
-            className="w-full flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 transition-colors"
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              padding: '12px 24px',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#374151',
+              backgroundColor: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s ease',
+              textAlign: 'left',
+              fontFamily: 'inherit',
+              outline: 'none'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
-            <Building2 className="w-4 h-4 mr-3 text-slate-500" />
+            <Building2 style={{ width: '20px', height: '20px', marginRight: '16px', color: '#64748b' }} />
             Organization
           </button>
 
@@ -120,21 +237,59 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
               onSubscriptionsClick?.()
               onClose()
             }}
-            className="w-full flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 transition-colors"
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              padding: '12px 24px',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#374151',
+              backgroundColor: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s ease',
+              textAlign: 'left',
+              fontFamily: 'inherit',
+              outline: 'none'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
-            <CreditCard className="w-4 h-4 mr-3 text-slate-500" />
+            <CreditCard style={{ width: '20px', height: '20px', marginRight: '16px', color: '#64748b' }} />
             Subscriptions
           </button>
 
-          <div className="border-t border-slate-200 mt-2 pt-2">
+          <div style={{
+            borderTop: '1px solid #e2e8f0',
+            marginTop: '12px',
+            paddingTop: '12px'
+          }}>
             <button
               onClick={() => {
                 onSignOutClick?.()
                 onClose()
               }}
-              className="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                padding: '12px 24px',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#dc2626',
+                backgroundColor: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s ease',
+                textAlign: 'left',
+                fontFamily: 'inherit',
+                outline: 'none'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#fef2f2'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
             >
-              <LogOut className="w-4 h-4 mr-3 text-red-500" />
+              <LogOut style={{ width: '20px', height: '20px', marginRight: '16px', color: '#ef4444' }} />
               Sign Out
             </button>
           </div>
