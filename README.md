@@ -33,6 +33,7 @@ function App() {
 - **User Profile** display with organization info
 - **Settings** quick access
 - **Custom Actions** support
+- **Integrated Account Modals** for Profile, Organization, and Billing (NEW!)
 - **Fully Typed** with TypeScript
 - **Responsive Design** with mobile support
 
@@ -171,22 +172,105 @@ useKeyboardShortcuts([
 ])
 ```
 
+## Integrated Account Modals (NEW!)
+
+The TopBar now includes complete account management modals out of the box! When you provide UI components, clicking Profile, Organization, or Subscriptions will open beautiful modals instead of navigating away.
+
+### Enable Integrated Modals
+
+```tsx
+import { TopBar } from '@y8c68/topbar-kit'
+import { useToast } from '@/components/ui/use-toast'
+// Import your UI components
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+// ... other components
+
+<TopBar 
+  config={{
+    // Enable integrated modals by providing components
+    profileComponents: {
+      Card, CardContent, CardHeader, CardTitle,
+      Button, Input, Label, Avatar,
+      AvatarFallback, AvatarImage, Separator
+    },
+    organizationComponents: {
+      Card, CardContent, CardHeader, CardTitle,
+      Button, Input, Label, Avatar,
+      AvatarFallback, AvatarImage,
+      Dialog, DialogContent, DialogDescription,
+      DialogFooter, DialogHeader, DialogTitle, DialogTrigger
+    },
+    billingComponents: {
+      Card, CardContent, CardHeader, CardTitle,
+      Button, Progress, Badge, Alert,
+      AlertTitle, AlertDescription,
+      Tabs, TabsContent, TabsList, TabsTrigger,
+      Dialog, DialogContent, DialogDescription,
+      DialogFooter, DialogHeader, DialogTitle, DialogTrigger
+    },
+    toast: toast, // Required for modals
+    // Optional: Enable debug info
+    enableDebugInfo: process.env.NODE_ENV === 'development'
+  }}
+/>
+```
+
+### What You Get
+
+1. **Profile Modal**: Full profile management using auth-kit's ProfilePageComponent
+2. **Organization Modal**: Organization switching using team-kit's OrganizationSwitcherComponent  
+3. **Subscriptions Modal**: Subscription management using billing-kit's SubscriptionManagerComponent
+
+All modals are:
+- Fully responsive
+- Keyboard accessible (ESC to close)
+- Overlay-based (don't navigate away)
+- Consistent with VFoundr design
+
+### Fallback Behavior
+
+If you don't provide components, the TopBar falls back to:
+- Custom onClick handlers (if provided)
+- Navigation to `/account` for Profile
+- Console logs for Organization/Billing
+
 ## Configuration
 
 ### TopBarConfig
 
 ```typescript
 interface TopBarConfig {
+  // Display options
   showSearch?: boolean
   searchPlaceholder?: string
   showNotifications?: boolean
   showSettings?: boolean
   showUserProfile?: boolean
   customActions?: TopBarAction[]
+  
+  // Event handlers
   onSearch?: (query: string) => void
   onNotificationClick?: () => void
+  onProfileClick?: () => void
+  onOrganizationClick?: () => void
+  onSubscriptionsClick?: () => void
+  onSignOutClick?: () => void
+  
+  // Navigation paths
   settingsPath?: string
   accountPath?: string
+  
+  // Integrated modal components (NEW!)
+  profileComponents?: { /* UI components */ }
+  organizationComponents?: { /* UI components */ }
+  billingComponents?: { /* UI components */ }
+  toast?: (props: ToastProps) => void
+  
+  // Additional options
+  enableDebugInfo?: boolean
+  onPasswordChange?: () => void
+  onTwoFactorManage?: () => void
 }
 ```
 

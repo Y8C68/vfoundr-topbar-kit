@@ -36,7 +36,7 @@ export const OrganizationModal: React.FC<OrganizationModalProps> = ({
     const { Dialog, DialogContent, DialogHeader, DialogTitle } = components
     
     return (
-      <Dialog open={isOpen} onOpenChange={(open: boolean) => !open && onClose()}>
+      <Dialog open={isOpen} onClose={onClose}>
         <DialogContent className={`max-w-2xl max-h-[80vh] overflow-y-auto ${className || ''}`}>
           {DialogHeader && DialogTitle && (
             <DialogHeader>

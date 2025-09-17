@@ -1,13 +1,20 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useUser, useOrganization } from '@clerk/clerk-react'
+import { useUser, useOrganization, useAuth } from '@y8c68/auth-kit'
 import { Bell, Settings, ChevronDown } from 'lucide-react'
 import { SearchBar } from '../Search/SearchBar'
 import { NotificationBell } from '../Notifications/NotificationBell'
 import { UserProfile } from '../UserProfile/UserProfile'
 import { UserProfileModal } from '../UserProfile/UserProfileModal'
+import { UserProfileDetailsModal, OrganizationModal, SubscriptionsModal } from '../UserProfile'
 import { TopBarConfig, TopBarAction } from '../../lib/types'
-import { clsx } from 'clsx'
+// Inline keyframe styles for pulse animation
+const pulseKeyframes = `
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+`
 
 export interface TopBarProps {
   config?: TopBarConfig
@@ -18,10 +25,24 @@ export const TopBar: React.FC<TopBarProps> = ({
   config = {}, 
   className 
 }) => {
+  // Inject pulse keyframes into document head if not already present
+  React.useEffect(() => {
+    const styleId = 'topbar-kit-keyframes'
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style')
+      style.id = styleId
+      style.textContent = pulseKeyframes
+      document.head.appendChild(style)
+    }
+  }, [])
   const navigate = useNavigate()
   const { user, isLoaded: userLoaded } = useUser()
   const { organization, isLoaded: orgLoaded } = useOrganization()
+  const { signOut } = useAuth()
   const [showProfileModal, setShowProfileModal] = useState(false)
+  const [showProfileDetailsModal, setShowProfileDetailsModal] = useState(false)
+  const [showOrganizationModal, setShowOrganizationModal] = useState(false)
+  const [showSubscriptionsModal, setShowSubscriptionsModal] = useState(false)
 
   const {
     showSearch = true,
@@ -37,7 +58,14 @@ export const TopBar: React.FC<TopBarProps> = ({
     onSubscriptionsClick,
     onSignOutClick,
     settingsPath = '/settings',
-    accountPath = '/account'
+    accountPath = '/account',
+    profileComponents,
+    organizationComponents,
+    billingComponents,
+    toast,
+    enableDebugInfo,
+    onPasswordChange,
+    onTwoFactorManage
   } = config
 
   const handleSettingsClick = useCallback(() => {
@@ -55,39 +83,46 @@ export const TopBar: React.FC<TopBarProps> = ({
   const handleDefaultProfileClick = useCallback(() => {
     if (onProfileClick) {
       onProfileClick()
+    } else if (profileComponents && toast) {
+      // Use integrated modal if components are provided
+      setShowProfileDetailsModal(true)
     } else {
       navigate(accountPath)
     }
-  }, [onProfileClick, navigate, accountPath])
+  }, [onProfileClick, profileComponents, toast, navigate, accountPath])
 
   const handleDefaultOrganizationClick = useCallback(() => {
     if (onOrganizationClick) {
       onOrganizationClick()
+    } else if (organizationComponents && toast) {
+      // Use integrated modal if components are provided
+      setShowOrganizationModal(true)
     } else {
       // Default organization action
       console.log('Organization clicked')
     }
-  }, [onOrganizationClick])
+  }, [onOrganizationClick, organizationComponents, toast])
 
   const handleDefaultSubscriptionsClick = useCallback(() => {
     if (onSubscriptionsClick) {
       onSubscriptionsClick()
+    } else if (billingComponents && toast) {
+      // Use integrated modal if components are provided
+      setShowSubscriptionsModal(true)
     } else {
       // Default subscriptions action
       console.log('Subscriptions clicked')
     }
-  }, [onSubscriptionsClick])
+  }, [onSubscriptionsClick, billingComponents, toast])
 
-  const handleDefaultSignOutClick = useCallback(() => {
+  const handleDefaultSignOutClick = useCallback(async () => {
     if (onSignOutClick) {
       onSignOutClick()
     } else {
-      // Default sign out action
-      if ((window as any).Clerk) {
-        (window as any).Clerk.signOut()
-      }
+      // Use auth-kit's signOut
+      await signOut()
     }
-  }, [onSignOutClick])
+  }, [onSignOutClick, signOut])
 
   // Memoize user and organization data to prevent unnecessary re-renders
   const userData = useMemo(() => {
@@ -115,16 +150,39 @@ export const TopBar: React.FC<TopBarProps> = ({
   // Don't render until both user and organization data are loaded
   if (!userLoaded || !orgLoaded) {
     return (
-      <div className={clsx(
-        'h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6',
-        className
-      )}>
-        <div className="animate-pulse">
-          <div className="h-8 bg-slate-200 rounded-md w-96"></div>
+      <div 
+        className={className}
+        style={{
+          height: '4rem',
+          minHeight: '4rem',
+          maxHeight: '4rem',
+          backgroundColor: 'white',
+          borderBottom: '1px solid #e2e8f0',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingLeft: '1.5rem',
+          paddingRight: '1.5rem',
+          overflow: 'hidden',
+          boxSizing: 'border-box'
+        }}
+      >
+        <div style={{ animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}>
+          <div style={{
+            height: '2rem',
+            backgroundColor: '#e2e8f0',
+            borderRadius: '0.375rem',
+            width: '24rem'
+          }}></div>
         </div>
-        <div className="flex items-center space-x-3">
-          <div className="animate-pulse">
-            <div className="h-8 w-8 bg-slate-200 rounded-full"></div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{ animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}>
+            <div style={{
+              height: '2rem',
+              width: '2rem',
+              backgroundColor: '#e2e8f0',
+              borderRadius: '50%'
+            }}></div>
           </div>
         </div>
       </div>
@@ -132,13 +190,26 @@ export const TopBar: React.FC<TopBarProps> = ({
   }
 
   return (
-    <div className={clsx(
-      'h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6',
-      className
-    )}>
+    <div 
+      className={className}
+      style={{
+        height: '4rem',
+        minHeight: '4rem',
+        maxHeight: '4rem',
+        backgroundColor: 'white',
+        borderBottom: '1px solid #e2e8f0',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingLeft: '1.5rem',
+        paddingRight: '1.5rem',
+        overflow: 'hidden',
+        boxSizing: 'border-box'
+      }}
+    >
       {/* Left: Universal Search */}
       {showSearch && (
-        <div className="flex-1 mr-8">
+        <div style={{ flex: '1 1 0%', maxWidth: 'calc(100% - 200px)', marginRight: '2rem' }}>
           <SearchBar 
             placeholder={searchPlaceholder}
             onSearch={onSearch}
@@ -147,19 +218,47 @@ export const TopBar: React.FC<TopBarProps> = ({
       )}
 
       {/* Right: Actions & Profile */}
-      <div className="flex items-center space-x-3">
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
         {/* Custom Actions */}
         {customActions.map((action) => (
           <button
             key={action.id}
             onClick={action.onClick}
-            className="relative p-2 rounded-lg hover:bg-slate-100 transition-colors"
+            style={{
+              position: 'relative',
+              padding: '0.5rem',
+              borderRadius: '0.5rem',
+              transition: 'background-color 0.2s ease',
+              border: 'none',
+              backgroundColor: 'transparent',
+              cursor: 'pointer'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
             title={action.label}
           >
             {action.icon}
             {action.badge && (
-              <div className="absolute -top-1 -right-1 min-w-[1rem] h-4 px-1 bg-red-500 rounded-full flex items-center justify-center">
-                <span className="text-[10px] text-white font-medium">
+              <div style={{
+                position: 'absolute',
+                top: '-0.25rem',
+                right: '-0.25rem',
+                minWidth: '1rem',
+                height: '1rem',
+                paddingLeft: '0.25rem',
+                paddingRight: '0.25rem',
+                backgroundColor: '#ef4444',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <span style={{
+                  fontSize: '0.625rem',
+                  color: 'white',
+                  fontWeight: '500',
+                  lineHeight: 1
+                }}>
                   {action.badge}
                 </span>
               </div>
@@ -176,10 +275,19 @@ export const TopBar: React.FC<TopBarProps> = ({
         {showSettings && (
           <button
             onClick={handleSettingsClick}
-            className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
+            style={{
+              padding: '0.5rem',
+              borderRadius: '0.5rem',
+              transition: 'background-color 0.2s ease',
+              border: 'none',
+              backgroundColor: 'transparent',
+              cursor: 'pointer'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
             title="Settings"
           >
-            <Settings className="h-4 w-4 text-slate-600" />
+            <Settings style={{ height: '1.25rem', width: '1.25rem', color: '#475569' }} />
           </button>
         )}
 
@@ -204,6 +312,39 @@ export const TopBar: React.FC<TopBarProps> = ({
           onOrganizationClick={handleDefaultOrganizationClick}
           onSubscriptionsClick={handleDefaultSubscriptionsClick}
           onSignOutClick={handleDefaultSignOutClick}
+        />
+      )}
+
+      {/* Profile Details Modal */}
+      {profileComponents && toast && (
+        <UserProfileDetailsModal
+          isOpen={showProfileDetailsModal}
+          onClose={() => setShowProfileDetailsModal(false)}
+          components={profileComponents}
+          toast={toast}
+          onPasswordChange={onPasswordChange}
+          onTwoFactorManage={onTwoFactorManage}
+        />
+      )}
+
+      {/* Organization Settings Modal */}
+      {organizationComponents && toast && (
+        <OrganizationModal
+          isOpen={showOrganizationModal}
+          onClose={() => setShowOrganizationModal(false)}
+          components={organizationComponents}
+          toast={toast}
+          enableDebugInfo={enableDebugInfo}
+        />
+      )}
+
+      {/* Subscriptions Modal */}
+      {billingComponents && toast && (
+        <SubscriptionsModal
+          isOpen={showSubscriptionsModal}
+          onClose={() => setShowSubscriptionsModal(false)}
+          components={billingComponents}
+          toast={toast}
         />
       )}
     </div>

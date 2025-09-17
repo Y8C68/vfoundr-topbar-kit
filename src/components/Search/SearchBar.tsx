@@ -36,16 +36,18 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   }, [])
 
   return (
-    <form onSubmit={handleSubmit} className="relative">
-      <div className="relative">
+    <form onSubmit={handleSubmit} style={{ position: 'relative' }}>
+      <div style={{ position: 'relative' }}>
         <Search 
-          className="absolute h-4 w-4 text-slate-400" 
           style={{ 
             left: '12px', 
             top: '50%', 
             transform: 'translateY(-50%)',
             position: 'absolute',
-            zIndex: 10
+            zIndex: 10,
+            height: '1.25rem',
+            width: '1.25rem',
+            color: '#94a3b8'
           }} 
         />
         <input
@@ -54,23 +56,42 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           placeholder={placeholder}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className={`w-full min-w-[300px] max-w-[600px] py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${className || ''}`}
+          className={className}
           style={{
+            width: '100%',
+            paddingTop: '0.5rem',
+            paddingBottom: '0.5rem',
             paddingLeft: '40px',
-            paddingRight: '64px'
+            paddingRight: '64px',
+            border: '1px solid #cbd5e1',
+            borderRadius: '0.5rem',
+            outline: 'none',
+            transition: 'all 0.2s'
+          }}
+          onFocus={(e) => {
+            e.target.style.borderColor = '#3b82f6';
+            e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = '#cbd5e1';
+            e.target.style.boxShadow = 'none';
           }}
         />
         <div 
-          className="absolute flex items-center space-x-1 text-xs text-slate-400"
           style={{
             right: '12px',
             top: '50%',
             transform: 'translateY(-50%)',
             position: 'absolute',
-            zIndex: 10
+            zIndex: 10,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.25rem',
+            fontSize: '0.75rem',
+            color: '#94a3b8'
           }}
         >
-          <Command className="h-3 w-3" />
+          <Command style={{ height: '1rem', width: '1rem' }} />
           <span>K</span>
         </div>
       </div>

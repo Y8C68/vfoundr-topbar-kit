@@ -1,6 +1,6 @@
 {
   "name": "@y8c68/topbar-kit",
-  "version": "0.3.1",
+  "version": "0.5.5",
   "description": "Shared top bar component for VFoundr applications",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -47,24 +47,21 @@
   "author": "VFoundr",
   "license": "MIT",
   "peerDependencies": {
-    "@clerk/clerk-react": "^4.0.0 || ^5.0.0",
-    "lucide-react": "^0.263.0 || ^0.300.0 || ^0.525.0",
+    "lucide-react": "^0.525.0",
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0",
     "react-router-dom": "^6.0.0 || ^7.0.0"
   },
   "dependencies": {
-    "@y8c68/auth-kit": "^0.2.1",
-    "@y8c68/team-kit": "^0.1.6",
-    "@y8c68/billing-kit": "^0.1.0",
-    "clsx": "^2.0.0"
+    "@y8c68/auth-kit": "^0.3.0",
+    "@y8c68/team-kit": "^0.2.0",
+    "@y8c68/billing-kit": "^0.2.0"
   },
   "devDependencies": {
-    "@clerk/clerk-react": "^5.35.3",
     "@types/node": "^20.0.0",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
-    "lucide-react": "^0.300.0",
+    "lucide-react": "^0.525.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.30.1",

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { UserData, OrganizationData } from '../../lib/types'
 import { getInitials } from '../../lib/utils'
@@ -20,35 +20,99 @@ export const UserProfile: React.FC<UserProfileProps> = ({
 }) => {
   const displayName = user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim()
   const initials = getInitials(displayName)
+  const [showDetails, setShowDetails] = useState(window.innerWidth >= 768)
+
+  useEffect(() => {
+    const handleResize = () => {
+      setShowDetails(window.innerWidth >= 768)
+    }
+    
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   return (
     <button
       onClick={onClick}
-      className={`flex items-center space-x-2 p-2 rounded-lg hover:bg-slate-100 transition-colors ${className || ''}`}
+      className={className}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem',
+        padding: '0.5rem',
+        borderRadius: '0.5rem',
+        transition: 'background-color 0.2s ease',
+        border: 'none',
+        backgroundColor: 'transparent',
+        cursor: 'pointer'
+      }}
+      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
+      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
     >
-      <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center overflow-hidden">
+      <div style={{
+        width: '2rem',
+        height: '2rem',
+        minWidth: '2rem',
+        minHeight: '2rem',
+        maxWidth: '2rem',
+        maxHeight: '2rem',
+        backgroundImage: 'linear-gradient(to bottom right, #3b82f6, #9333ea)',
+        borderRadius: '50%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        flexShrink: 0
+      }}>
         {user.imageUrl ? (
           <img 
             src={user.imageUrl} 
             alt={displayName || 'User'} 
-            className="w-8 h-8 rounded-full object-cover"
+            style={{ 
+              width: '2rem',
+              height: '2rem',
+              borderRadius: '50%',
+              objectFit: 'cover'
+            }}
           />
         ) : (
-          <span className="text-white font-semibold text-xs">
+          <span style={{
+            color: 'white',
+            fontWeight: '600',
+            fontSize: '0.75rem'
+          }}>
             {initials}
           </span>
         )}
       </div>
-      <div className="hidden md:block text-left">
-        <p className="text-sm font-medium text-slate-900 truncate max-w-32">
+      <div style={{
+        display: showDetails ? 'block' : 'none',
+        textAlign: 'left'
+      }}>
+        <p style={{
+          fontSize: '0.875rem',
+          fontWeight: '500',
+          color: '#0f172a',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+          maxWidth: '8rem'
+        }}>
           {displayName}
         </p>
-        <p className="text-xs text-slate-600 truncate max-w-32">
+        <p style={{
+          fontSize: '0.75rem',
+          color: '#475569',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+          maxWidth: '8rem'
+        }}>
           {organization?.name || 'Personal Account'}
         </p>
       </div>
       {showDropdownIcon && (
-        <ChevronDown className="h-3 w-3 text-slate-400" />
+        <ChevronDown style={{ height: '1rem', width: '1rem', color: '#94a3b8' }} />
       )}
     </button>
   )
